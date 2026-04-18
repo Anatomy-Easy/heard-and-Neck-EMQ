@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EMQ: Head & Neck</title>
+
+  <style>
+    :root{
+      --blue:#1d4ed8;
+      --blue-2:#2563eb;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --ok:#16a34a;
+      --bad:#dc2626;
+      --soft:#eef2ff;
+      --soft-2:#eff6ff;
+      --shadow: 0 6px 22px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:linear-gradient(180deg,#f8fbff 0%,#f8fafc 100%);
+      color:var(--text);
+      padding:16px;
+    }
+    .app{ max-width:1100px; margin:0 auto; }
+
+    .topbar{
+      background:var(--blue);
+      color:#fff;
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+      margin-bottom:14px;
+    }
+    .title{ margin:0 0 6px 0; font-size:clamp(20px,3vw,28px); font-weight:900; line-height:1.2; }
+    .subtitle{ margin:0; font-size:14px; opacity:.96; line-height:1.45; max-width:940px; }
+
+    .navcard,.panel,.note-card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .navcard,.note-card,.panel{
+      padding:14px;
+      margin-bottom:14px;
+    }
+
+    .section-title{
+      margin:0 0 10px 0;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    .note-text{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .inline-code{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      background:#f8fafc;
+      border:1px solid rgba(29,78,216,.18);
+      border-radius:8px;
+      padding:2px 6px;
+      color:#1e3a8a;
+      font-size:12px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .tabbtn{
+      border:1px solid var(--border);
+      background:#fff;
+      padding:10px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:13px;
+      box-shadow:0 1px 6px rgba(0,0,0,.04);
+      color:var(--text);
+    }
+    .tabbtn.active{
+      border-color: rgba(29,78,216,.32);
+      background:var(--soft);
+      color:var(--blue);
+    }
+
+    .panel{
+      padding:14px;
+      margin-bottom:14px;
+    }
+    .hidden{ display:none; }
+
+    .row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:14px;
+    }
+    .controls,.metrics{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .btn{
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:13px;
+      color:var(--text);
+    }
+    .btn.primary{
+      background:var(--blue);
+      border-color:var(--blue);
+      color:#fff;
+    }
+    .btn.soft{
+      background:var(--soft);
+      border-color:rgba(29,78,216,.2);
+      color:var(--blue);
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 10px;
+      border-radius:999px;
+      background:var(--soft);
+      border:1px solid rgba(29,78,216,.18);
+      color:var(--blue);
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .metric{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 10px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--border);
+      color:var(--text);
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    details.box{
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      overflow:hidden;
+      background:#fff;
+      margin-bottom:12px;
+    }
+    details.box[open]{
+      box-shadow:0 1px 10px rgba(15,23,42,.04);
+    }
+    details.box > summary{
+      list-style:none;
+      cursor:pointer;
+      padding:12px 14px;
+      background:var(--soft);
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    details.box > summary::-webkit-details-marker{ display:none; }
+    .summary-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .summary-title{
+      margin:0;
+      font-size:14px;
+      font-weight:900;
+      color:var(--blue);
+      min-width:0;
+    }
+    .summary-note{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .boxbody{ padding:14px; }
+
+    .lead{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+      margin-bottom:10px;
+    }
+
+    .grid{
+      display:grid;
+      gap:14px;
+      grid-template-columns: 1fr 1.2fr;
+    }
+
+    .optlist{
+      display:grid;
+      gap:8px;
+      margin-top:10px;
+    }
+    .opt{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      background:#fff;
+    }
+    .opt strong{
+      min-width:30px;
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+      border-radius:8px;
+      padding:6px 0;
+      background:var(--soft);
+      color:var(--blue);
+      border:1px solid rgba(29,78,216,.18);
+      font-size:12px;
+    }
+    .opt span{
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    .scenario{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      margin-bottom:10px;
+      background:#fff;
+    }
+    .scenario p{
+      margin:0 0 10px 0;
+      font-weight:900;
+      font-size:13px;
+      line-height:1.45;
+    }
+    .answerrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    select{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:11px 12px;
+      font-size:14px;
+      background:#fff;
+      min-width:260px;
+      max-width:100%;
+      flex:1 1 260px;
+    }
+    .feedback{
+      margin-top:8px;
+      font-size:12px;
+      font-weight:900;
+      display:none;
+    }
+    .feedback.ok{ color:var(--ok); }
+    .feedback.bad{ color:var(--bad); }
+    .reveal{
+      margin-top:8px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:var(--soft-2);
+      border:1px solid #bfdbfe;
+      color:#1e3a8a;
+      font-size:12px;
+      line-height:1.4;
+      display:none;
+    }
+
+    .scoreline{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:10px;
+    }
+    .score{
+      font-weight:900;
+      font-size:13px;
+    }
+
+
+    .modebar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-bottom:14px;
+    }
+    .mode-label{
+      font-size:12px;
+      font-weight:900;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+    .switch{
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:#fff;
+    }
+    .switch input{
+      appearance:none;
+      width:42px;
+      height:24px;
+      background:#cbd5e1;
+      border-radius:999px;
+      position:relative;
+      outline:none;
+      cursor:pointer;
+      margin:0;
+    }
+    .switch input::after{
+      content:"";
+      position:absolute;
+      top:3px;
+      left:3px;
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      background:#fff;
+      box-shadow:0 1px 4px rgba(0,0,0,.15);
+      transition:transform .18s ease;
+    }
+    .switch input:checked{
+      background:var(--blue);
+    }
+    .switch input:checked::after{
+      transform:translateX(18px);
+    }
+    .switch-text{
+      font-size:13px;
+      font-weight:900;
+      color:var(--text);
+      min-width:92px;
+    }
+
+
+
+    .options-sticky{
+      align-self:start;
+    }
+    @media(min-width: 901px){
+      .options-sticky{
+        position:sticky;
+        top:12px;
+      }
+    }
+
+    @media(max-width: 900px){
+      .grid{ grid-template-columns:1fr; }
+    }
+    @media(max-width: 640px){
+      body{ padding:10px; }
+      .panel,.navcard,.topbar,.note-card{ padding:12px; }
+      .tabs,.controls,.metrics,.answerrow,.row{ flex-direction:column; align-items:stretch; }
+      .tabbtn,.btn,select{ width:100%; }
+      .summary-note{ white-space:normal; text-align:right; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="topbar">
+      <h1 class="title">EMQ: Head & Neck</h1>
+      <p class="subtitle">.</p>
+    </div>
+
+    <section class="note-card">
+      <h2 class="section-title"></h2>
+      <p class="note-text">.</p>
+    </section>
+
+
+    <section class="navcard">
+      <div class="modebar">
+        <span class="mode-label">Mode</span>
+        <label class="switch">
+          <input type="checkbox" id="modeToggle" aria-label="Toggle exam mode">
+          <span class="switch-text" id="modeText">Learning</span>
+        </label>
+        <span class="badge" id="modeHint">Immediate feedback</span>
+      </div>
+    </section>
+
+    <section class="navcard">
+      <h2 class="section-title">Themes</h2>
+      <div class="tabs" id="tabs"></div>
+    </section>
+
+    <div id="panels"></div>
+  </div>
+
+<script>
+  const DATA = {
+  emq_sets: [
+    {
+      theme: "Mandibular Anatomy",
+      options: {
+        "A": "Condylar process",
+        "B": "Coronoid process",
+        "C": "Genial tubercles",
+        "D": "Inferior alveolar nerve",
+        "E": "Inferior alveolar nerve and vessels",
+        "F": "Lingual nerve",
+        "G": "Lingula",
+        "H": "Lateral pterygoid",
+        "I": "Mandibular notch",
+        "J": "Masseter",
+        "K": "Medial pterygoid",
+        "L": "Mental foramen",
+        "M": "Mylohyoid",
+        "N": "Nerve to mylohyoid",
+        "O": "Temporalis"
+      },
+      questions: [
+        {
+          "scenario": "A patient undergoes an inferior alveolar nerve block before extraction of a mandibular molar. The anesthetic is deposited near an opening on the medial surface of the ramus. Which structure normally passes through this opening?",
+          "correct_option": "D",
+          "explanation": "The inferior alveolar nerve enters the mandibular foramen on the medial surface of the ramus and then travels within the mandibular canal."
+        },
+        {
+          "scenario": "Following trauma to the body of the mandible, a patient develops numbness of the lower lip and chin. Through which opening does the affected sensory nerve emerge onto the face?",
+          "correct_option": "L",
+          "explanation": "The mental nerve emerges through the mental foramen and supplies sensation to the lower lip and chin."
+        },
+        {
+          "scenario": "During a dental procedure on the medial side of the mandibular ramus, a patient develops loss of general sensation over the anterior two-thirds of the tongue. Which nerve was most likely injured?",
+          "correct_option": "F",
+          "explanation": "The lingual nerve carries general somatic sensation from the anterior two-thirds of the tongue and lies close to the medial ramus."
+        },
+        {
+          "scenario": "A radiograph shows a canal extending from the mandibular foramen anteriorly toward the premolar region. Which structure normally travels within this canal?",
+          "correct_option": "E",
+          "explanation": "The mandibular canal contains the inferior alveolar nerve together with its accompanying vessels."
+        },
+        {
+          "scenario": "A fracture through the superior posterior part of the mandible disrupts the articulation with the temporal bone. Which part of the mandible is fractured?",
+          "correct_option": "A",
+          "explanation": "The condylar process forms the mandibular component of the temporomandibular joint."
+        },
+        {
+          "scenario": "A patient has painful limitation of mouth opening after facial trauma. The muscle primarily affected inserts onto the anterior superior projection of the ramus. Which structure is this?",
+          "correct_option": "B",
+          "explanation": "The temporalis muscle inserts on the coronoid process, the anterior superior projection of the ramus."
+        },
+        {
+          "scenario": "A mandibular angle fracture causes displacement of the lateral fragment due to pull of a strong elevator muscle attached to its outer surface. Which muscle is responsible?",
+          "correct_option": "J",
+          "explanation": "The masseter attaches to the lateral surface of the ramus and angle and elevates the mandible."
+        },
+        {
+          "scenario": "During administration of an inferior alveolar nerve block, the dentist uses a small bony projection just superior to the mandibular foramen as a landmark. What is this structure?",
+          "correct_option": "G",
+          "explanation": "The lingula is a bony projection guarding the mandibular foramen and is an important landmark in regional anesthesia."
+        },
+        {
+          "scenario": "A patient with mandibular trauma has weakness of the mylohyoid muscle. The injured branch arises just before its parent nerve enters the mandibular foramen. Which nerve has been damaged?",
+          "correct_option": "N",
+          "explanation": "The nerve to mylohyoid branches from the inferior alveolar nerve before that nerve enters the mandibular foramen."
+        },
+        {
+          "scenario": "Imaging of the internal surface of the mandible shows a midline bony prominence serving as an attachment for tongue muscles. Which structure is being identified?",
+          "correct_option": "C",
+          "explanation": "The genial tubercles give attachment to genioglossus and geniohyoid muscles."
+        },
+        {
+          "scenario": "A patient has difficulty elevating the floor of the mouth after surgery in the submandibular region. Which muscle originates from the mylohyoid line of the mandible?",
+          "correct_option": "M",
+          "explanation": "The mylohyoid originates from the mylohyoid line and forms the muscular floor of the mouth."
+        },
+        {
+          "scenario": "A fracture near the angle of the mandible disrupts a muscle attached to its medial surface, contributing to impaired elevation of the mandible. Which muscle is most likely affected?",
+          "correct_option": "K",
+          "explanation": "The medial pterygoid attaches to the medial surface of the angle and assists in elevation of the mandible."
+        },
+        {
+          "scenario": "A patient sustains trauma to the depression between the condylar and coronoid processes. Which anatomical feature has been injured?",
+          "correct_option": "I",
+          "explanation": "The mandibular notch is the depression between the coronoid and condylar processes."
+        },
+        {
+          "scenario": "A fractured condylar neck is displaced anteriorly by the pull of a muscle inserting into the pterygoid fovea. Which muscle causes this displacement?",
+          "correct_option": "H",
+          "explanation": "The lateral pterygoid inserts into the pterygoid fovea and tends to pull the condylar fragment anteriorly."
+        },
+        {
+          "scenario": "On clinical examination, a dentist palpates a foramen on the anterolateral surface of the mandible below the premolar teeth. Which structure is being palpated?",
+          "correct_option": "L",
+          "explanation": "The mental foramen lies below the premolars and transmits the mental neurovascular bundle."
+        }
+      ]
+    },
+
+    {
+      theme: "Skull Base and Cranial Nerves",
+      options: {
+        "A": "Foramen magnum",
+        "B": "Foramen ovale",
+        "C": "Foramen rotundum",
+        "D": "Hypoglossal canal",
+        "E": "Internal acoustic meatus",
+        "F": "Optic canal",
+        "G": "Superior orbital fissure",
+        "H": "Stylomastoid foramen",
+        "I": "Jugular foramen",
+        "J": "Ophthalmic artery",
+        "K": "CN IX, X, and XI",
+        "L": "Vertebral arteries"
+      },
+      questions: [
+        {
+          "scenario": "A patient with trigeminal neuralgia undergoes a procedure directed at the mandibular division of the trigeminal nerve at the skull base. Through which opening is this division accessed?",
+          "correct_option": "B",
+          "explanation": "The mandibular division of the trigeminal nerve (V3) exits the cranial cavity through the foramen ovale."
+        },
+        {
+          "scenario": "A patient presents with progressive unilateral hearing loss and ipsilateral facial weakness. Imaging reveals a lesion in the petrous temporal bone involving cranial nerves VII and VIII. Through which opening do these nerves pass?",
+          "correct_option": "E",
+          "explanation": "CN VII and CN VIII pass together through the internal acoustic meatus in the petrous temporal bone."
+        },
+        {
+          "scenario": "A patient with cavernous sinus pathology develops ophthalmoplegia, ptosis, and sensory loss over the forehead. Through which structure do the affected nerves enter the orbit?",
+          "correct_option": "G",
+          "explanation": "The superior orbital fissure transmits CN III, IV, VI, and V1 into the orbit."
+        },
+        {
+          "scenario": "After a midface fracture, a patient develops numbness over the cheek and upper lip. Which opening transmits the injured nerve?",
+          "correct_option": "C",
+          "explanation": "The maxillary division of the trigeminal nerve (V2) passes through the foramen rotundum."
+        },
+        {
+          "scenario": "A skull base tumor causes hoarseness, dysphagia, and weakness of sternocleidomastoid. Which group of cranial nerves is most likely involved?",
+          "correct_option": "K",
+          "explanation": "Cranial nerves IX, X, and XI pass through the jugular foramen and account for these deficits."
+        },
+        {
+          "scenario": "A patient cannot protrude the tongue in the midline, and it deviates toward one side. Which opening is most likely involved in this lesion?",
+          "correct_option": "D",
+          "explanation": "The hypoglossal nerve exits the skull through the hypoglossal canal; lesions cause ipsilateral tongue weakness and deviation."
+        },
+        {
+          "scenario": "Compression of the optic nerve by a lesion at the skull base also threatens which accompanying structure within the same opening?",
+          "correct_option": "J",
+          "explanation": "The ophthalmic artery accompanies the optic nerve through the optic canal."
+        },
+        {
+          "scenario": "A patient develops complete ipsilateral facial paralysis after trauma near the mastoid process. Which opening is most likely affected?",
+          "correct_option": "H",
+          "explanation": "The facial nerve exits the skull through the stylomastoid foramen."
+        },
+        {
+          "scenario": "A mass at the craniovertebral junction compresses major vessels passing through the largest opening in the skull base. Which vessel is most likely to be affected?",
+          "correct_option": "L",
+          "explanation": "The vertebral arteries pass through the foramen magnum together with the medulla and spinal roots of the accessory nerve."
+        }
+      ]
+    },
+
+    {
+      theme: "Neck Triangles and Root of the Neck",
+      options: {
+        "A": "Accessory nerve",
+        "B": "Brachial plexus",
+        "C": "Carotid triangle",
+        "D": "Deep cervical lymph nodes",
+        "E": "Internal jugular vein",
+        "F": "Lower trunk of brachial plexus",
+        "G": "Mediastinum",
+        "H": "Muscular triangle",
+        "I": "Posterior triangle of the neck",
+        "J": "Prevertebral muscles",
+        "K": "Rectus capitis anterior",
+        "L": "Scalene tubercle on first rib",
+        "M": "Second part of subclavian artery",
+        "N": "Subclavian artery",
+        "O": "Submandibular gland",
+        "P": "T1 vertebra",
+        "Q": "Transverse cervical nerve",
+        "R": "Flexion of the head",
+        "S": "Numbness and tingling in the ring and little fingers"
+      },
+      questions: [
+        {
+          "scenario": "A 25-year-old man sustains a penetrating injury in the posterior triangle and is unable to shrug his shoulder against resistance. Which structure has most likely been injured?",
+          "correct_option": "A",
+          "explanation": "The accessory nerve crosses the posterior triangle superficially and supplies trapezius, so injury impairs shoulder shrug."
+        },
+        {
+          "scenario": "A surgeon wishes to expose the bifurcation of the common carotid artery. In which anatomical triangle is this structure most readily approached?",
+          "correct_option": "C",
+          "explanation": "The carotid triangle contains the common carotid artery and its bifurcation."
+        },
+        {
+          "scenario": "A patient presents with a swelling inferior to the body of the mandible. Imaging shows enlargement of a major salivary gland in this region. Which gland is affected?",
+          "correct_option": "O",
+          "explanation": "The submandibular gland lies beneath the body of the mandible in the submandibular triangle."
+        },
+        {
+          "scenario": "During surgery, the infrahyoid muscles are reflected to expose deeper cervical structures. In which triangle are these muscles located?",
+          "correct_option": "H",
+          "explanation": "The muscular triangle contains the infrahyoid muscles and visceral structures of the neck."
+        },
+        {
+          "scenario": "A patient with metastatic head and neck cancer has enlargement of lymph nodes that run closely along a major venous channel deep to sternocleidomastoid. Which structure are these nodes most closely related to?",
+          "correct_option": "E",
+          "explanation": "Deep cervical lymph nodes lie along the internal jugular vein beneath sternocleidomastoid."
+        },
+        {
+          "scenario": "A superficial cervical plexus block is performed at the midpoint of the posterior border of sternocleidomastoid. Loss of sensation develops over the anterior cervical region. Which cutaneous nerve has been anesthetized?",
+          "correct_option": "Q",
+          "explanation": "The transverse cervical nerve is a cutaneous branch of the cervical plexus supplying the anterior neck."
+        },
+        {
+          "scenario": "A pulsatile swelling is noted at the lower part of the posterior triangle near the clavicle. Which artery is most likely involved?",
+          "correct_option": "N",
+          "explanation": "The subclavian artery occupies the root of the neck and is related to the lower part of the posterior triangle."
+        },
+        {
+          "scenario": "Which structure forms the posterior boundary of the root of the neck?",
+          "correct_option": "P",
+          "explanation": "The root of the neck is bounded posteriorly by the T1 vertebra."
+        },
+        {
+          "scenario": "A patient develops upper-limb paresthesia due to compression of structures between the anterior and middle scalene muscles. Which major structure is most likely affected?",
+          "correct_option": "B",
+          "explanation": "The brachial plexus passes between the anterior and middle scalene muscles and may be compressed there."
+        },
+        {
+          "scenario": "A patient with thoracic outlet syndrome reports numbness predominantly in the ring and little fingers. Which part of the brachial plexus is most likely compressed?",
+          "correct_option": "F",
+          "explanation": "The lower trunk, formed by C8 and T1, contributes to the ulnar distribution and is commonly involved in neurogenic thoracic outlet syndrome."
+        },
+        {
+          "scenario": "Which group of muscles forms the posterior wall of the retropharyngeal space?",
+          "correct_option": "J",
+          "explanation": "The prevertebral muscles lie posteriorly and are covered by prevertebral fascia."
+        },
+        {
+          "scenario": "Which is the primary action of rectus capitis anterior?",
+          "correct_option": "R",
+          "explanation": "Rectus capitis anterior assists flexion of the head at the atlanto-occipital joint."
+        },
+        {
+          "scenario": "Where does scalenus anterior insert?",
+          "correct_option": "L",
+          "explanation": "Scalenus anterior inserts on the scalene tubercle of the first rib."
+        },
+        {
+          "scenario": "Which structure lies directly posterior to scalenus anterior?",
+          "correct_option": "M",
+          "explanation": "The second part of the subclavian artery lies posterior to scalenus anterior, while the vein lies anterior."
+        },
+        {
+          "scenario": "A cervical rib produces the most typical neurogenic thoracic outlet syndrome pattern. Which clinical finding is most characteristic?",
+          "correct_option": "S",
+          "explanation": "Compression of the lower brachial plexus produces symptoms in the ulnar distribution, especially the ring and little fingers."
+        },
+        {
+          "scenario": "Infection within the prevertebral space may track inferiorly into which region most directly?",
+          "correct_option": "G",
+          "explanation": "Deep neck infections can descend inferiorly into the mediastinum through fascial planes."
+        },
+        {
+          "scenario": "In classic scalene syndrome, which part of the brachial plexus is typically compressed?",
+          "correct_option": "F",
+          "explanation": "Compression between the scalene muscles typically affects the lower trunk of the brachial plexus."
+        }
+      ]
+    },
+
+    {
+      theme: "Cranial Cavity, Meninges, and Dural Venous Sinuses",
+      options: {
+        "A": "Abducens nerve (CN VI)",
+        "B": "Arachnoid granulations",
+        "C": "Bridging veins",
+        "D": "Inferior sagittal sinus",
+        "E": "Lens-shaped epidural hematoma due to middle meningeal artery rupture",
+        "F": "Loss of smell (anosmia)",
+        "G": "Monro–Kellie doctrine",
+        "H": "Tentorium cerebelli",
+        "I": "Valveless facial and cranial venous connections",
+        "J": "Vital brainstem compression within a confined posterior fossa"
+      },
+      questions: [
+        {
+          "scenario": "A 20-year-old man is brought to the emergency department after a blow to the lateral side of the skull. CT demonstrates a biconvex extra-axial hemorrhage. Which option best explains this finding?",
+          "correct_option": "E",
+          "explanation": "A lens-shaped epidural hematoma classically follows rupture of the middle meningeal artery."
+        },
+        {
+          "scenario": "A patient with a large intracranial mass develops rising intracranial pressure because the skull cannot expand to accommodate additional volume. Which principle best explains this?",
+          "correct_option": "G",
+          "explanation": "The Monro–Kellie doctrine states that the total intracranial volume is fixed."
+        },
+        {
+          "scenario": "A fracture through the cribriform plate is followed by inability to detect odors. Which consequence is most likely?",
+          "correct_option": "F",
+          "explanation": "Olfactory nerve fibers traverse the cribriform plate, so injury causes anosmia."
+        },
+        {
+          "scenario": "Which dural reflection separates the occipital lobes of the cerebrum from the cerebellum?",
+          "correct_option": "H",
+          "explanation": "The tentorium cerebelli separates the cerebellum from the occipital lobes."
+        },
+        {
+          "scenario": "A patient with cavernous sinus pathology develops lateral rectus palsy. Which cranial nerve lies within the sinus adjacent to the internal carotid artery?",
+          "correct_option": "A",
+          "explanation": "The abducens nerve runs within the cavernous sinus beside the internal carotid artery and is especially vulnerable."
+        },
+        {
+          "scenario": "Which structure is chiefly responsible for the return of cerebrospinal fluid into the venous circulation?",
+          "correct_option": "B",
+          "explanation": "Arachnoid granulations return CSF to the dural venous sinuses, especially the superior sagittal sinus."
+        },
+        {
+          "scenario": "A patient develops a subdural hematoma after sudden acceleration-deceleration head trauma. Which structure is most likely torn?",
+          "correct_option": "C",
+          "explanation": "Subdural hematomas usually result from rupture of bridging veins."
+        },
+        {
+          "scenario": "Infection from the central face spreads intracranially to the cavernous sinus. Which anatomical feature permits this route of spread?",
+          "correct_option": "I",
+          "explanation": "Facial and cranial veins are valveless, allowing retrograde spread of infection."
+        },
+        {
+          "scenario": "Which dural venous sinus lies in the free inferior border of the falx cerebri?",
+          "correct_option": "D",
+          "explanation": "The inferior sagittal sinus runs within the free lower border of the falx cerebri."
+        },
+        {
+          "scenario": "Why are expanding lesions in the posterior cranial fossa particularly dangerous?",
+          "correct_option": "J",
+          "explanation": "The posterior fossa is confined and contains the brainstem, so expanding lesions can quickly compromise vital centers."
+        }
+      ]
+    },
+
+    {
+      theme: "Cervical Fascia",
+      options: {
+        "A": "Alar fascia",
+        "B": "Axillary sheath",
+        "C": "Buccopharyngeal fascia",
+        "D": "Carotid sheath",
+        "E": "Danger space",
+        "F": "Investing layer of deep cervical fascia",
+        "G": "Pretracheal fascia",
+        "H": "Prevertebral fascia",
+        "I": "Retropharyngeal space",
+        "J": "Superior mediastinum",
+        "K": "Thyroid gland",
+        "L": "Trapezius and sternocleidomastoid",
+        "M": "Infrahyoid muscles",
+        "N": "Internal jugular vein, common/internal carotid artery, and vagus nerve",
+        "O": "Brachial plexus and subclavian artery"
+      },
+      questions: [
+        {
+          "scenario": "During neck dissection, the surgeon identifies the most superficial layer of deep cervical fascia that splits to enclose sternocleidomastoid and trapezius. Which structure is this?",
+          "correct_option": "F",
+          "explanation": "The investing layer is the most superficial component of the deep cervical fascia and encloses sternocleidomastoid and trapezius."
+        },
+        {
+          "scenario": "A patient with a thyroid swelling is found to have a fascial layer that encloses the gland and continues inferiorly toward the thorax. Which fascial layer is involved?",
+          "correct_option": "G",
+          "explanation": "The visceral part of the pretracheal fascia surrounds the thyroid gland and continues inferiorly into the thorax."
+        },
+        {
+          "scenario": "A deep neck infection spreads posterior to the pharynx but anterior to the alar fascia. In which anatomical space is the infection located?",
+          "correct_option": "I",
+          "explanation": "The retropharyngeal space lies between the buccopharyngeal fascia anteriorly and the alar fascia posteriorly."
+        },
+        {
+          "scenario": "A severe cervical infection descends rapidly from the skull base to the posterior mediastinum. Which space most directly permits this pattern of spread?",
+          "correct_option": "E",
+          "explanation": "The danger space lies between the alar fascia and prevertebral fascia and can extend into the mediastinum."
+        },
+        {
+          "scenario": "A surgeon opens a tubular fascial compartment containing the internal jugular vein and vagus nerve during carotid surgery. Which structure has been opened?",
+          "correct_option": "D",
+          "explanation": "The carotid sheath encloses the carotid artery, internal jugular vein, and vagus nerve."
+        },
+        {
+          "scenario": "Which set of structures is contained within the carotid sheath?",
+          "correct_option": "N",
+          "explanation": "The carotid sheath contains the internal jugular vein, common or internal carotid artery, and vagus nerve."
+        },
+        {
+          "scenario": "During an anterior approach to the cervical spine, the surgeon reflects the fascial layer covering the vertebral column and prevertebral muscles. Which layer is this?",
+          "correct_option": "H",
+          "explanation": "The prevertebral fascia surrounds the vertebral column and associated deep muscles of the neck."
+        },
+        {
+          "scenario": "A fascial prolongation around the brachial plexus and subclavian artery is seen passing laterally into the axilla. What is this continuation called?",
+          "correct_option": "B",
+          "explanation": "The axillary sheath is a lateral continuation of the prevertebral fascia."
+        },
+        {
+          "scenario": "Which structures are enclosed together as they pass into the axilla within a fascial sleeve derived from the prevertebral fascia?",
+          "correct_option": "O",
+          "explanation": "The axillary sheath encloses the brachial plexus and subclavian artery as they pass into the axilla."
+        },
+        {
+          "scenario": "During tracheostomy, the surgeon separates a fascial layer that encloses the strap muscles anterior to the airway. Which layer is being divided?",
+          "correct_option": "G",
+          "explanation": "The muscular part of the pretracheal fascia encloses the infrahyoid muscles anterior to the airway."
+        },
+        {
+          "scenario": "Which muscles are enclosed by the muscular part of the pretracheal fascia?",
+          "correct_option": "M",
+          "explanation": "The pretracheal fascia encloses the infrahyoid, or strap, muscles."
+        },
+        {
+          "scenario": "A retropharyngeal abscess is described as lying immediately posterior to the pharyngeal wall. Which fascia forms the anterior boundary of this space?",
+          "correct_option": "C",
+          "explanation": "The buccopharyngeal fascia covers the posterior aspect of the pharynx and forms the anterior wall of the retropharyngeal space."
+        },
+        {
+          "scenario": "A clinician explains that one deep fascial layer contributes to a complete collar around the neck and splits to invest two large superficial muscles. Which muscles are enclosed by this layer?",
+          "correct_option": "L",
+          "explanation": "The investing layer encloses sternocleidomastoid and trapezius."
+        },
+        {
+          "scenario": "An infection in the visceral compartment of the neck is expected to descend inferiorly into which region because of fascial continuity?",
+          "correct_option": "J",
+          "explanation": "The pretracheal fascia continues into the superior mediastinum and may transmit infection inferiorly."
+        },
+        {
+          "scenario": "A radiologist identifies a thin fascial lamina between the retropharyngeal space and the danger space. Which structure is being described?",
+          "correct_option": "A",
+          "explanation": "The alar fascia lies posterior to the retropharyngeal space and anterior to the danger space."
+        }
+      ]
+    }
+  ]
+};
+
+  const $ = (sel) => document.querySelector(sel);
+  const escapeHtml = (s) => String(s ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+
+  const tabsEl = $("#tabs");
+  const panelsEl = $("#panels");
+  let APP_MODE = "learning";
+
+  function getSet(index){ return DATA.emq_sets[index] || {}; }
+  function getQuestions(index){
+    const set = getSet(index);
+    return Array.isArray(set.questions) ? set.questions : [];
+  }
+  function getOptions(index){
+    const set = getSet(index);
+    return set.options || {};
+  }
+  function makeLabel(theme, idx){
+    return String(theme || "").trim() || `Theme ${idx+1}`;
+  }
+  function getSelected(setIndex, qIndex){
+    const sel = document.querySelector(`#q_${setIndex}_${qIndex}`);
+    return sel ? String(sel.value || "").trim() : "";
+  }
+  function getCorrect(setIndex, qIndex){
+    const q = getQuestions(setIndex)[qIndex] || {};
+    return String(q.correct_option || "").trim();
+  }
+  function getCorrectText(setIndex, qIndex){
+    const optMap = getOptions(setIndex);
+    const correct = getCorrect(setIndex, qIndex);
+    return optMap[correct] || "";
+  }
+  function getExplanation(setIndex, qIndex){
+    const q = getQuestions(setIndex)[qIndex] || {};
+    return String(q.explanation || "").trim();
+  }
+  function isExamMode(){
+    return APP_MODE === "exam";
+  }
+  function updateModeUI(){
+    const toggle = document.getElementById("modeToggle");
+    const modeText = document.getElementById("modeText");
+    const modeHint = document.getElementById("modeHint");
+    if(toggle) toggle.checked = isExamMode();
+    if(modeText) modeText.textContent = isExamMode() ? "Exam" : "Learning";
+    if(modeHint) modeHint.textContent = isExamMode() ? "Feedback after Check All" : "Immediate feedback";
+    document.querySelectorAll("[id^='checkAll_']").forEach(btn => {
+      btn.textContent = isExamMode() ? "Submit / Check All" : "Check All";
+    });
+    document.querySelectorAll("[data-action='checkOne']").forEach(btn => {
+      btn.style.display = isExamMode() ? "none" : "inline-flex";
+    });
+  }
+
+  function updateMetrics(setIndex){
+    const questions = getQuestions(setIndex);
+    let answered = 0, correct = 0;
+    for(let i=0;i<questions.length;i++){
+      const selected = getSelected(setIndex, i);
+      const ans = getCorrect(setIndex, i);
+      if(selected) answered++;
+      if(selected && ans && selected === ans) correct++;
+    }
+    const total = questions.length;
+    const answeredEl = document.getElementById(`answered_${setIndex}`);
+    const correctEl = document.getElementById(`correct_${setIndex}`);
+    const totalEl = document.getElementById(`total_${setIndex}`);
+    const scoreEl = document.getElementById(`score_${setIndex}`);
+    if(answeredEl) answeredEl.textContent = `Answered: ${answered}`;
+    if(correctEl) correctEl.textContent = `Correct: ${correct}`;
+    if(totalEl) totalEl.textContent = `Total: ${total}`;
+    if(scoreEl) scoreEl.textContent = `Score: ${correct} / ${total}`;
+  }
+
+  function setFeedback(setIndex, qIndex, showIfEmpty=true, showReveal=true){
+    const fb = document.querySelector(`#fb_${setIndex}_${qIndex}`);
+    const reveal = document.querySelector(`#reveal_${setIndex}_${qIndex}`);
+    if(!fb || !reveal) return;
+
+    const selected = getSelected(setIndex, qIndex);
+    const correct = getCorrect(setIndex, qIndex);
+    const correctText = getCorrectText(setIndex, qIndex);
+
+    fb.style.display = "block";
+    fb.classList.remove("ok","bad");
+
+    if(!selected){
+      if(showIfEmpty){
+        fb.classList.add("bad");
+        fb.textContent = "No option selected yet.";
+      } else {
+        fb.style.display = "none";
+        fb.textContent = "";
+      }
+      reveal.style.display = "none";
+      reveal.innerHTML = "";
+      return;
+    }
+
+    if(!correct){
+      fb.classList.add("bad");
+      fb.textContent = "Correct answer not set in DATA.";
+      reveal.style.display = "none";
+      reveal.innerHTML = "";
+      return;
+    }
+
+    if(selected === correct){
+      fb.classList.add("ok");
+      fb.textContent = "Correct.";
+    } else {
+      fb.classList.add("bad");
+      fb.textContent = "Incorrect.";
+    }
+
+    const explanation = getExplanation(setIndex, qIndex);
+    if(showReveal){
+      reveal.innerHTML = `<strong>Correct answer:</strong> ${escapeHtml(correct)} — ${escapeHtml(correctText)}${explanation ? `<br><strong>Explanation:</strong> ${escapeHtml(explanation)}` : ""}`;
+      reveal.style.display = "block";
+    } else {
+      reveal.style.display = "none";
+      reveal.innerHTML = "";
+    }
+  }
+
+  function checkOne(setIndex, qIndex){
+    if(isExamMode()) return;
+    setFeedback(setIndex, qIndex, true, true);
+    updateMetrics(setIndex);
+  }
+
+  function checkAll(setIndex){
+    const questions = getQuestions(setIndex);
+    for(let i=0;i<questions.length;i++){
+      setFeedback(setIndex, i, true, true);
+    }
+    updateMetrics(setIndex);
+  }
+
+  function resetSet(setIndex){
+    const questions = getQuestions(setIndex);
+    for(let i=0;i<questions.length;i++){
+      const sel = document.querySelector(`#q_${setIndex}_${i}`);
+      if(sel) sel.value = "";
+      const fb = document.querySelector(`#fb_${setIndex}_${i}`);
+      const reveal = document.querySelector(`#reveal_${setIndex}_${i}`);
+      if(fb){
+        fb.style.display = "none";
+        fb.textContent = "";
+        fb.classList.remove("ok","bad");
+      }
+      if(reveal){
+        reveal.style.display = "block";
+        reveal.innerHTML = "";
+      }
+    }
+    updateMetrics(setIndex);
+  }
+
+  function revealAll(setIndex){
+    const questions = getQuestions(setIndex);
+    for(let i=0;i<questions.length;i++){
+      const reveal = document.querySelector(`#reveal_${setIndex}_${i}`);
+      const correct = getCorrect(setIndex, i);
+      const correctText = getCorrectText(setIndex, i);
+      if(reveal){
+        const explanation = getExplanation(setIndex, qIndex);
+    reveal.innerHTML = `<strong>Correct answer:</strong> ${escapeHtml(correct)} — ${escapeHtml(correctText)}${explanation ? `<br><strong>Explanation:</strong> ${escapeHtml(explanation)}` : ""}`;
+        reveal.style.display = "block";
+      }
+    }
+  }
+
+  function hideAllReveals(setIndex){
+    const questions = getQuestions(setIndex);
+    for(let i=0;i<questions.length;i++){
+      const reveal = document.querySelector(`#reveal_${setIndex}_${i}`);
+      if(reveal) reveal.style.display = "none";
+    }
+  }
+
+  function renderEmq(setObj, mountEl, setIndex){
+    mountEl.innerHTML = "";
+    const options = getOptions(setIndex);
+    const questions = getQuestions(setIndex);
+    const optEntries = Object.entries(options);
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "grid";
+
+    const left = document.createElement("div");
+    left.innerHTML = `
+      <details class="box options-sticky" id="options_${setIndex}" open>
+        <summary>
+          <div class="summary-left">
+            <span class="badge">Options</span>
+            <h3 class="summary-title">${escapeHtml(setObj.theme || "EMQ Set")}</h3>
+          </div>
+          <span class="summary-note">${optEntries.length} options</span>
+        </summary>
+        <div class="boxbody">
+          <div class="lead">Each option may be used once, more than once, or not at all.</div>
+          <div class="optlist">
+            ${optEntries.map(([k,v]) => `
+              <div class="opt">
+                <strong>${escapeHtml(k)}</strong>
+                <span>${escapeHtml(v)}</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </details>
+    `;
+
+    const right = document.createElement("div");
+    right.innerHTML = `
+      <details class="box" id="questions_${setIndex}" open>
+        <summary>
+          <div class="summary-left">
+            <span class="badge">Scenarios</span>
+            <h3 class="summary-title">${questions.length} scenario${questions.length === 1 ? "" : "s"}</h3>
+          </div>
+          <span class="summary-note">Answer and review</span>
+        </summary>
+        <div class="boxbody">
+          ${questions.map((q, i) => `
+            <div class="scenario">
+              <p>${i+1}. ${escapeHtml(q.scenario || "—")}</p>
+              <div class="answerrow">
+                <select class="answerSelect" id="q_${setIndex}_${i}" aria-label="Choose option for scenario ${i+1}">
+                  <option value="">Select option...</option>
+                  ${optEntries.map(([k,v]) => `<option value="${escapeHtml(k)}">${escapeHtml(k)} — ${escapeHtml(v)}</option>`).join("")}
+                </select>
+                <button class="btn soft" type="button" data-action="checkOne" data-setindex="${setIndex}" data-qindex="${i}">Check</button>
+              </div>
+              <div class="feedback" id="fb_${setIndex}_${i}"></div>
+              <div class="reveal" id="reveal_${setIndex}_${i}" style="display:none;"></div>
+            </div>
+          `).join("")}
+          <div class="scoreline">
+            <div class="score" id="score_${setIndex}">Score: 0 / ${questions.length}</div>
+          </div>
+        </div>
+      </details>
+    `;
+
+    wrapper.appendChild(left);
+    wrapper.appendChild(right);
+    mountEl.appendChild(wrapper);
+
+    mountEl.querySelectorAll('button[data-action="checkOne"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const sIdx = Number(btn.dataset.setindex);
+        const qIdx = Number(btn.dataset.qindex);
+        checkOne(sIdx, qIdx);
+      });
+    });
+
+    mountEl.querySelectorAll('button[data-action="explainOne"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const sIdx = Number(btn.dataset.setindex);
+        const qIdx = Number(btn.dataset.qindex);
+        const reveal = document.querySelector(`#reveal_${sIdx}_${qIdx}`);
+        const correct = getCorrect(sIdx, qIdx);
+        const correctText = getCorrectText(sIdx, qIdx);
+        if(reveal){
+          const isHidden = reveal.style.display !== "block";
+          const explanation = getExplanation(setIndex, qIndex);
+    reveal.innerHTML = `<strong>Correct answer:</strong> ${escapeHtml(correct)} — ${escapeHtml(correctText)}${explanation ? `<br><strong>Explanation:</strong> ${escapeHtml(explanation)}` : ""}`;
+          reveal.style.display = isHidden ? "block" : "none";
+        }
+      });
+    });
+
+    mountEl.querySelectorAll(".answerSelect").forEach(sel => {
+      sel.addEventListener("change", () => {
+        const parts = sel.id.split("_");
+        const sIdx = Number(parts[1]);
+        const qIdx = Number(parts[2]);
+        const fb = document.querySelector(`#fb_${sIdx}_${qIdx}`);
+        const reveal = document.querySelector(`#reveal_${sIdx}_${qIdx}`);
+        if(fb){
+          fb.style.display = "none";
+          fb.textContent = "";
+          fb.classList.remove("ok","bad");
+        }
+        if(reveal){
+          reveal.style.display = "none";
+          reveal.innerHTML = "";
+        }
+        updateMetrics(setIndex);
+      });
+    });
+
+    updateMetrics(setIndex);
+  }
+
+  function setActive(index){
+    tabsEl.querySelectorAll(".tabbtn").forEach((btn, i) => {
+      btn.classList.toggle("active", i === index);
+    });
+    panelsEl.querySelectorAll(".panel").forEach((p, i) => {
+      p.classList.toggle("hidden", i !== index);
+    });
+  }
+
+  function buildUI(){
+    const sets = Array.isArray(DATA.emq_sets) ? DATA.emq_sets : [];
+    tabsEl.innerHTML = "";
+    panelsEl.innerHTML = "";
+
+    if(!sets.length){
+      tabsEl.innerHTML = `<div class="lead">No EMQ sets found.</div>`;
+      return;
+    }
+
+    sets.forEach((setObj, idx) => {
+      const tab = document.createElement("button");
+      tab.type = "button";
+      tab.className = "tabbtn";
+      tab.textContent = makeLabel(setObj.theme, idx);
+      tab.addEventListener("click", () => setActive(idx));
+      tabsEl.appendChild(tab);
+
+      const panel = document.createElement("section");
+      panel.className = "panel hidden";
+      panel.id = `panel_${idx}`;
+      panel.innerHTML = `
+        <div class="row">
+          <div class="metrics">
+            <span class="badge">${escapeHtml(makeLabel(setObj.theme, idx))}</span>
+            <span class="metric" id="answered_${idx}">Answered: 0</span>
+            <span class="metric" id="correct_${idx}">Correct: 0</span>
+            <span class="metric" id="total_${idx}">Total: 0</span>
+          </div>
+          <div class="controls">
+            <button class="btn primary" type="button" id="checkAll_${idx}">Check All</button>            <button class="btn" type="button" id="reset_${idx}">Reset</button>
+          </div>
+        </div>
+        <div id="mount_${idx}"></div>
+      `;
+      panelsEl.appendChild(panel);
+
+      renderEmq(setObj, panel.querySelector(`#mount_${idx}`), idx);
+
+      panel.querySelector(`#checkAll_${idx}`).addEventListener("click", () => checkAll(idx));      panel.querySelector(`#reset_${idx}`).addEventListener("click", () => resetSet(idx));
+    });
+
+    setActive(0);
+    updateModeUI();
+
+    const modeToggle = document.getElementById("modeToggle");
+    if(modeToggle){
+      modeToggle.addEventListener("change", () => {
+        APP_MODE = modeToggle.checked ? "exam" : "learning";
+        updateModeUI();
+        document.querySelectorAll(".feedback").forEach(el => {
+          el.style.display = "none";
+          el.textContent = "";
+          el.classList.remove("ok","bad");
+        });
+        document.querySelectorAll(".reveal").forEach(el => {
+          el.style.display = "none";
+          el.innerHTML = "";
+        });
+      });
+    }
+  }
+
+  buildUI();
+</script>
+</body>
+</html>
